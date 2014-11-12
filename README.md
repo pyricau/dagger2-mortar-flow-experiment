@@ -4,11 +4,11 @@ This is a totally experimental hack to see how we could get Dagger 2, Mortar and
 
 ## Goal
 
-The goal is to evaluate if it's at all possible, the amount of infrastructure and changes needed to get it all to work together, and more importantly see how the screen / view / presenter code would feel.
+The goal is to see how the screen / view / presenter code would feel.
 
 ## Mortar
 
-I modified Mortar to decouple it from Dagger 1. Clone [Mortar](https://github.com/square/mortar), checkoug `py/dagger2`, and run `mvn clean install -DskipTests -pl :mortar -am`
+I modified Mortar to decouple it from Dagger 1. Clone [Mortar](https://github.com/square/mortar), checkout `py/dagger2`, and run `mvn clean install -DskipTests -pl :mortar -am`
 
 ## Flow
 
@@ -23,11 +23,13 @@ This project uses the latest Flow snapshot. You can clone [Flow](https://github.
 
 ## What to look at
 
+All the interesting files are [here](https://github.com/pyricau/dagger2-mortar-flow-experiment/tree/master/app/src/main/java/dagger/demo).
+
 ### HasScreenDeps
 
 Bindings that belong to a higher level component are not exposed in the child component. To make them available, one needs to declare them on the parent component:
 
-```
+```java
 @dagger.Component(modules = ApplicationModule.class) //
 interface Component {
   Toaster toaster();
@@ -36,7 +38,7 @@ interface Component {
 
 If there are several layers of components, you need to pass it down at each level. You can use a shared interface to make this process easier:
 
-```
+```java
 interface HasScreenDeps {
   Toaster toaster();
   FlowBundler flowBundler();
@@ -52,7 +54,7 @@ interface Component extends HasScreenDeps {
 
 You now need to associate a scoping annotation with a component, and then you can use that annotation on the binding.
 
-```
+```java
 @Scope
 public @interface MyComponentScope {
 }
@@ -71,7 +73,7 @@ public static class Presenter {
 
 You don't need to create a new annotation for every component though, Dagger2 relies on compile time uniqueness of the annotation value. Therefore, we defined the following:
 
-```
+```java
 @Scope
 public @interface ScopeSingleton {
   Class<?> value();
@@ -80,7 +82,7 @@ public @interface ScopeSingleton {
 
 And we can now use it for all components:
 
-```
+```java
 @dagger.Component(dependencies = MyActivity.Component.class) //
 @ScopeSingleton(Component.class) //
 interface Component {
@@ -106,7 +108,7 @@ ComponentBuilder does that for you. Two advantages: less boilerplate in the scre
 
 We need a way to associate a screen with a component. `@WithComponent` does that:
 
-```
+```java
 @Layout(R.layout.view1) @WithComponent(Screen1.Component.class)
 public class Screen1 extends Path {
 

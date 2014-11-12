@@ -50,9 +50,9 @@ interface Component extends HasScreenDeps {
 
 ### Scoping annotations
 
-`@Singleton` is still around but is now just another scoping annotations. Question: shouldn't it be removed from Dagger 2 then?
+`@Singleton` is still around but is now just another scoping annotation.
 
-You now need to associate a scoping annotation with a component, and then you can use that annotation on the binding.
+We now can associate a scoping annotation with a component, and then use that annotation on the binding.
 
 ```java
 @Scope
@@ -64,7 +64,7 @@ public @interface MyComponentScope {
 interface Component {
 }
 
-@SMyComponentScope
+@MyComponentScope
 public static class Presenter {
   @Inject Presenter() {
   }
@@ -96,7 +96,7 @@ public static class Presenter {
 }
 ```
 
-Question: if Dagger 2 keeps `@Singleton`, shouldn't it accept an optional class param to make it useful?
+Ideally, `@Singleton` would either be removed from Dagger 2, or updated to have an optional `Class<?>` field. However it's defined in JSR 330 so it can't be done unless Dagger 2 drops the spec.
 
 ### ComponentBuilder
 
@@ -118,3 +118,7 @@ public class Screen1 extends Path {
   }
 }
 ```
+
+### Screen / View / Presenter
+
+It's all [in here](https://github.com/pyricau/dagger2-mortar-flow-experiment/tree/master/app/src/main/java/dagger/demo).
